@@ -1,1 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiery Amber Timetable</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --amber: #ff7e00;
+            --amber-light: #ffaa5e;
+            --amber-dark: #cc6600;
+            --dark-bg: #0a0a1a;
+            --darker-bg: #050510;
+            --text-light: #f0f0f0;
+            --text-lighter: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(to bottom, #000000 0%, var(--darker-bg) 100%);
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--amber);
+            text-shadow: 0 0 10px var(--amber-light), 0 0 20px var(--amber);
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--amber), transparent);
+            border-radius: 50%;
+        }
+        
+        .clock-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-direction: column;
+        }
+        
+        .clock {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--amber);
+            text-shadow: 0 0 5px var(--amber-light);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            background-color: rgba(10, 10, 26, 0.7);
+            border: 1px solid var(--amber);
+            box-shadow: 0 0 15px var(--amber);
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ampm {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--amber-light);
+            text-shadow: 0 0 3px var(--amber);
+        }
+        
+        .clock:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--amber);
+        }
+        
+        .timetable {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .activity {
+            background-color: rgba(10, 10, 26, 0.7);
+            border: 1px solid var(--amber);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .activity::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 126, 0, 0.1), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .activity:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 126, 0, 0.3);
+        }
+        
+        .activity:hover::before {
+            left: 100%;
+        }
+        
+        .activity h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--amber-light);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .activity p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        .time-range {
+            font-size: 0.9rem;
+            color: var(--amber-light);
+            margin-top: 0.5rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .location {
+            margin-top: 3rem;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--amber);
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px var(--amber-light);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .clock {
+                font-size: 2rem;
+                padding: 0.8rem 1.5rem;
+            }
+            
+            .timetable {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation for current activity */
+        .current-activity {
+            animation: pulse 2s infinite;
+            border: 1px solid var(--text-lighter);
+            box-shadow: 0 0 20px var(--amber);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px var(--amber); }
+            50% { box-shadow: 0 0 25px var(--amber-light); }
+            100% { box-shadow: 0 0 10px var(--amber); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Daily Timetable</h1>
+            <div class="clock-container">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="ampm" id="ampm">AM</div>
+            </div>
+        </header>
+        
+        <div class="timetable">
+            <div class="activity" id="wake-up" data-start="5:00" data-end="6:00">
+                <h2>Wake up</h2>
+                <p>Start the day with energy and purpose</p>
+                <div class="time-range">5:00 AM - 6:00 AM</div>
+            </div>
+            
+            <div class="activity" data-start="6:00" data-end="7:00">
+                <h2>Tea drinking</h2>
+                <p>Enjoy a warm cup of tea to awaken the senses</p>
+                <div class="time-range">6:00 AM - 7:00 AM</div>
+            </div>
+            
+            <div class="activity" data-start="7:00" data-end="8:00">
+                <h2>After tea chit chat</h2>
+                <p>Socialize and connect with others</p>
+                <div class="time-range">7:00 AM - 8:00 AM</div>
+            </div>
+            
+            <div class="activity" data-start="8:00" data-end="9:00">
+                <h2>Restroom (dump)</h2>
+                <p>Take care of personal hygiene</p>
+                <div class="time-range">8:00 AM - 9:00 AM</div>
+            </div>
+            
+            <div class="activity" data-start="9:00" data-end="12:00">
+                <h2>Learning</h2>
+                <p>Focus on acquiring new knowledge and skills</p>
+                <div class="time-range">9:00 AM - 12:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="12:00" data-end="14:00">
+                <h2>Lunch + Anime/Games</h2>
+                <p>Refuel with food and enjoy some entertainment</p>
+                <div class="time-range">12:00 PM - 2:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="14:00" data-end="17:00">
+                <h2>Study + Movies/TV</h2>
+                <p>Balance productivity with relaxation</p>
+                <div class="time-range">2:00 PM - 5:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="17:00" data-end="19:00">
+                <h2>Study again</h2>
+                <p>Continue the learning process</p>
+                <div class="time-range">5:00 PM - 7:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="19:00" data-end="20:00">
+                <h2>Bath</h2>
+                <p>Refresh and cleanse</p>
+                <div class="time-range">7:00 PM - 8:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="20:00" data-end="21:00">
+                <h2>Dinner</h2>
+                <p>Enjoy the evening meal</p>
+                <div class="time-range">8:00 PM - 9:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="21:00" data-end="23:00">
+                <h2>Netflix and chill</h2>
+                <p>Relax with your favorite shows</p>
+                <div class="time-range">9:00 PM - 11:00 PM</div>
+            </div>
+            
+            <div class="activity" data-start="23:00" data-end="5:00">
+                <h2>Play video games</h2>
+                <p>Unwind with interactive entertainment</p>
+                <div class="time-range">11:00 PM - 5:00 AM</div>
+            </div>
+        </div>
+        
+        <div class="location">
+            IST (Chennai)
+        </div>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Create stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 200;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Random size between 1 and 3px
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Random position
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Random twinkle duration
+                star.style.setProperty('--duration', `${Math.random() * 5 + 3}s`);
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Initialize particles.js
+        function initParticles() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ff7e00"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ff7e00",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 1,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        }
+        
+        // Convert 24-hour time to 12-hour format with AM/PM
+        function formatTime12Hour(hours, minutes, seconds) {
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            return {
+                timeString: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
+                ampm: ampm
+            };
+        }
+        
+        // Update clock with 12-hour format
+        function updateClock() {
+            const now = new Date();
+            
+            // Convert to IST (UTC+5:30)
+            const utcOffset = 5.5 * 60 * 60 * 1000;
+            const istTime = new Date(now.getTime() + utcOffset);
+            
+            let hours = istTime.getHours();
+            const minutes = istTime.getMinutes().toString().padStart(2, '0');
+            const seconds = istTime.getSeconds().toString().padStart(2, '0');
+            
+            const formattedTime = formatTime12Hour(hours, minutes, seconds);
+            
+            document.getElementById('clock').textContent = formattedTime.timeString;
+            document.getElementById('ampm').textContent = formattedTime.ampm;
+            
+            // Highlight current activity based on time
+            highlightCurrentActivity(hours, minutes);
+        }
+        
+        // Highlight current activity based on time
+        function highlightCurrentActivity(hours, minutes) {
+            const activities = document.querySelectorAll('.activity');
+            activities.forEach(activity => activity.classList.remove('current-activity'));
+            
+            // Convert current time to minutes since midnight for easier comparison
+            const currentTimeInMinutes = hours * 60 + parseInt(minutes);
+            
+            activities.forEach(activity => {
+                const startTime = activity.dataset.start;
+                const endTime = activity.dataset.end;
+                
+                // Parse start and end times
+                const [startH, startM] = startTime.split(':').map(Number);
+                const [endH, endM] = endTime.split(':').map(Number);
+                
+                // Convert to minutes since midnight
+                let startMinutes = startH * 60 + (startM || 0);
+                let endMinutes = endH * 60 + (endM || 0);
+                
+                // Handle overnight activities (like sleep from 23:00 to 5:00)
+                if (endMinutes < startMinutes) {
+                    if (currentTimeInMinutes >= startMinutes || currentTimeInMinutes < endMinutes) {
+                        activity.classList.add('current-activity');
+                    }
+                } else {
+                    if (currentTimeInMinutes >= startMinutes && currentTimeInMinutes < endMinutes) {
+                        activity.classList.add('current-activity');
+                    }
+                }
+            });
+        }
+        
+        // Add micro-interactions to activities
+        function addActivityInteractions() {
+            const activities = document.querySelectorAll('.activity');
+            
+            activities.forEach(activity => {
+                activity.addEventListener('mouseenter', () => {
+                    activity.style.transform = 'scale(1.03)';
+                    activity.style.boxShadow = '0 10px 20px rgba(255, 126, 0, 0.5)';
+                });
+                
+                activity.addEventListener('mouseleave', () => {
+                    activity.style.transform = '';
+                    activity.style.boxShadow = '';
+                });
+                
+                activity.addEventListener('click', () => {
+                    activity.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        activity.style.transform = '';
+                    }, 200);
+                });
+            });
+        }
+        
+        // Initialize everything when the page loads
+        window.onload = function() {
+            createStars();
+            initParticles();
+            updateClock();
+            setInterval(updateClock, 1000);
+            addActivityInteractions();
+            
+            // Add a subtle animation to the header
+            const header = document.querySelector('h1');
+            header.style.transition = 'all 0.5s ease';
+            setTimeout(() => {
+                header.style.transform = 'translateY(0)';
+                header.style.opacity = '1';
+            }, 100);
+        };
+    </script>
+</body>
+</html>
